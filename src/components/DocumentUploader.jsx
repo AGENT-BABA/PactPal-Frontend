@@ -46,9 +46,13 @@ export const DocumentUploader = ({ onDocumentUpload, onClausesExtracted }) => {
 
     reader.onload = async (e) => {
       const documentContent = e.target.result;
+
+
       try {
         // Process summary first
         console.log("🔄 Starting document summary processing...");
+        console.log(API_ENDPOINTS.SIMPLIFY_TEXT);
+
         const summaryResponse = await fetch(API_ENDPOINTS.SIMPLIFY_TEXT, {
           method: "POST",
           headers: {
