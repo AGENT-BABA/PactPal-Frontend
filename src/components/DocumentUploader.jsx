@@ -59,12 +59,27 @@ export const DocumentUploader = ({ onDocumentUpload, onClausesExtracted }) => {
 
         if (!summaryResponse.ok) {
           const text = await summaryResponse.text();
+          console.error("Summary API Error:", {
+            status: summaryResponse.status,
+            statusText: summaryResponse.statusText,
+            body: text,
+            url: API_ENDPOINTS.SIMPLIFY_TEXT
+          });
           throw new Error(
             `Summary processing failed: ${summaryResponse.status} - ${text}`
           );
         }
 
-        const summaryData = await summaryResponse.json();
+        let summaryData;
+        try {
+          summaryData = await summaryResponse.json();
+          console.log("Summary API Response:", summaryData);
+        } catch (jsonError) {
+          console.error("JSON parsing error for summary:", jsonError);
+          const responseText = await summaryResponse.text();
+          console.error("Raw response text:", responseText);
+          throw new Error(`Invalid JSON response from summary API: ${jsonError.message}`);
+        }
         onDocumentUpload(summaryData.summary);
         console.log("✅ Summary processing complete");
 
@@ -82,10 +97,26 @@ export const DocumentUploader = ({ onDocumentUpload, onClausesExtracted }) => {
         });
 
         if (!clausesResponse.ok) {
-          throw new Error("Clause extraction failed");
+          const text = await clausesResponse.text();
+          console.error("Clauses API Error:", {
+            status: clausesResponse.status,
+            statusText: clausesResponse.statusText,
+            body: text,
+            url: API_ENDPOINTS.EXTRACT_CLAUSES
+          });
+          throw new Error(`Clause extraction failed: ${clausesResponse.status} - ${text}`);
         }
 
-        const clausesData = await clausesResponse.json();
+        let clausesData;
+        try {
+          clausesData = await clausesResponse.json();
+          console.log("Clauses API Response:", clausesData);
+        } catch (jsonError) {
+          console.error("JSON parsing error for clauses:", jsonError);
+          const responseText = await clausesResponse.text();
+          console.error("Raw response text:", responseText);
+          throw new Error(`Invalid JSON response from clauses API: ${jsonError.message}`);
+        }
         onClausesExtracted(clausesData.clauses);
         console.log("✅ Clause extraction complete");
       } catch (err) {
