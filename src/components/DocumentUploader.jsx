@@ -1,8 +1,8 @@
 // File: src/components/DocumentUploader.jsx
 
-import React, { useState } from 'react';
-import { Upload, File, X, CheckCircle, AlertCircle } from 'lucide-react';
-import { API_ENDPOINTS } from '../config/api';
+import React, { useState } from "react";
+import { Upload, File, X, CheckCircle, AlertCircle } from "lucide-react";
+import { API_ENDPOINTS } from "../config/api";
 
 export const DocumentUploader = ({ onDocumentUpload, onClausesExtracted }) => {
   const [isDragOver, setIsDragOver] = useState(false);
@@ -32,7 +32,8 @@ export const DocumentUploader = ({ onDocumentUpload, onClausesExtracted }) => {
 
   const handleFileUpload = (file) => {
     // Check file size (2MB limit)
-    if (file.size > 2 * 1024 * 1024) { // 2MB in bytes
+    if (file.size > 2 * 1024 * 1024) {
+      // 2MB in bytes
       setError("File size too large. Please upload a file smaller than 2MB.");
       return;
     }
@@ -47,43 +48,46 @@ export const DocumentUploader = ({ onDocumentUpload, onClausesExtracted }) => {
       const documentContent = e.target.result;
       try {
         // Process summary first
-        console.log('🔄 Starting document summary processing...');
+        console.log("🔄 Starting document summary processing...");
         const summaryResponse = await fetch(API_ENDPOINTS.SIMPLIFY_TEXT, {
-          method: 'POST',
+          method: "POST",
           headers: {
-            'Content-Type': 'application/json',
+            "Content-Type": "application/json",
           },
           body: JSON.stringify({ documentContent }),
         });
 
         if (!summaryResponse.ok) {
-          throw new Error('Summary processing failed');
+          const text = await summaryResponse.text();
+          throw new Error(
+            `Summary processing failed: ${summaryResponse.status} - ${text}`
+          );
         }
 
         const summaryData = await summaryResponse.json();
         onDocumentUpload(summaryData.summary);
-        console.log('✅ Summary processing complete');
+        console.log("✅ Summary processing complete");
 
         // Wait a moment before processing clauses
-        await new Promise(resolve => setTimeout(resolve, 1000));
+        await new Promise((resolve) => setTimeout(resolve, 1000));
 
         // Process clauses second
-        console.log('🔄 Starting clause extraction...');
+        console.log("🔄 Starting clause extraction...");
         const clausesResponse = await fetch(API_ENDPOINTS.EXTRACT_CLAUSES, {
-          method: 'POST',
+          method: "POST",
           headers: {
-            'Content-Type': 'application/json',
+            "Content-Type": "application/json",
           },
           body: JSON.stringify({ documentContent }),
         });
 
         if (!clausesResponse.ok) {
-          throw new Error('Clause extraction failed');
+          throw new Error("Clause extraction failed");
         }
 
         const clausesData = await clausesResponse.json();
         onClausesExtracted(clausesData.clauses);
-        console.log('✅ Clause extraction complete');
+        console.log("✅ Clause extraction complete");
       } catch (err) {
         console.error("API call failed:", err);
         setError("Failed to process document. Please try again.");
@@ -121,8 +125,8 @@ export const DocumentUploader = ({ onDocumentUpload, onClausesExtracted }) => {
           htmlFor="file-upload"
           className={`flex flex-col items-center justify-center p-6 border-2 border-dashed rounded-xl cursor-pointer transition-colors ${
             isDragOver
-              ? 'border-blue-500 bg-blue-50'
-              : 'border-gray-300 bg-gray-50 hover:bg-gray-100'
+              ? "border-blue-500 bg-blue-50"
+              : "border-gray-300 bg-gray-50 hover:bg-gray-100"
           }`}
           onDragOver={handleDragOver}
           onDragLeave={handleDragLeave}
