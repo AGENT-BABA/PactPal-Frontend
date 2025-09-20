@@ -1,33 +1,28 @@
 import React from 'react';
-import { FileText, AlertTriangle, CheckCircle } from 'lucide-react';
+import { FileText, AlertTriangle, CheckCircle, Sparkles } from 'lucide-react';
 
 export const SummaryDisplay = ({ summary }) => {
-  // Function to parse summary into meaningful bullet points
   const parseSummaryToPoints = (summaryText) => {
     if (!summaryText) return [];
     
-    // First, try to split by paragraphs (double newlines)
     let points = summaryText
-      .split(/\n\s*\n/) // Split by double newlines (paragraphs)
+      .split(/\n\s*\n/)
       .map(point => point.trim())
-      .filter(point => point.length > 20); // Keep meaningful paragraphs
+      .filter(point => point.length > 20);
     
-    // If no paragraphs found, try to split by single newlines but keep longer content
     if (points.length <= 1) {
       points = summaryText
-        .split(/\n/) // Split by single newlines
+        .split(/\n/)
         .map(point => point.trim())
-        .filter(point => point.length > 30); // Keep longer lines
+        .filter(point => point.length > 30);
     }
     
-    // If still no good splits, try to split by sentences but keep them together
     if (points.length <= 1) {
       const sentences = summaryText
         .split(/[.!?]+/)
         .map(sentence => sentence.trim())
         .filter(sentence => sentence.length > 20);
       
-      // Group sentences into meaningful points (2-3 sentences per point)
       points = [];
       for (let i = 0; i < sentences.length; i += 2) {
         const point = sentences.slice(i, i + 2).join('. ').trim();
@@ -37,18 +32,16 @@ export const SummaryDisplay = ({ summary }) => {
       }
     }
     
-    // If we still have very few points, try splitting by common separators but keep content longer
     if (points.length <= 1) {
       points = summaryText
-        .split(/[•\-\*]+/) // Split by bullet points, dashes, asterisks
+        .split(/[•\-\*]+/)
         .map(point => point.trim())
-        .filter(point => point.length > 40) // Keep longer content
-        .slice(0, 6); // Limit to 6 points
+        .filter(point => point.length > 40)
+        .slice(0, 6);
     }
     
-    // Final fallback: if we have very long content, split it into chunks
     if (points.length <= 1 && summaryText.length > 200) {
-      const chunkSize = Math.ceil(summaryText.length / 4); // Split into 4 chunks
+      const chunkSize = Math.ceil(summaryText.length / 4);
       points = [];
       for (let i = 0; i < summaryText.length; i += chunkSize) {
         const chunk = summaryText.slice(i, i + chunkSize).trim();
@@ -58,53 +51,60 @@ export const SummaryDisplay = ({ summary }) => {
       }
     }
     
-    return points.length > 0 ? points : [summaryText]; // Fallback to original text
+    return points.length > 0 ? points : [summaryText];
   };
 
   const summaryPoints = parseSummaryToPoints(summary);
-  
-  // Debug: Log the parsing results
-  console.log('Original summary:', summary);
-  console.log('Parsed points:', summaryPoints);
 
   return (
-    <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-      <h2 className="text-xl font-semibold text-gray-900 mb-4 flex items-center">
-        <FileText className="h-5 w-5 mr-2 text-blue-600" />
-        Document Summary
-      </h2>
+    <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-8">
+      <div className="flex items-center mb-6">
+        <div className="h-12 w-12 bg-gradient-to-r from-green-500 to-emerald-400 rounded-xl flex items-center justify-center mr-4">
+          <FileText className="h-6 w-6 text-white" />
+        </div>
+        <div>
+          <h2 className="text-2xl font-bold text-white mb-1">Document Summary</h2>
+          <p className="text-gray-400">AI-powered analysis of your legal document</p>
+        </div>
+      </div>
       
       <div className="space-y-4">
         {summaryPoints.length > 0 ? (
           summaryPoints.map((point, index) => (
-            <div key={index} className="flex items-start space-x-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
-              <div className="flex-shrink-0 mt-1">
-                <CheckCircle className="h-5 w-5 text-blue-600" />
-              </div>
-              <div className="flex-1">
-                <p className="text-gray-700 leading-relaxed">
-                  {point}
-                </p>
+            <div key={index} className="group">
+              <div className="flex items-start space-x-4 p-6 bg-gradient-to-r from-blue-500/10 to-cyan-400/10 border border-blue-400/20 rounded-xl hover:from-blue-500/15 hover:to-cyan-400/15 transition-all duration-300">
+                <div className="flex-shrink-0 mt-1">
+                  <div className="h-8 w-8 bg-gradient-to-r from-blue-500 to-cyan-400 rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                    <CheckCircle className="h-4 w-4 text-white" />
+                  </div>
+                </div>
+                <div className="flex-1">
+                  <p className="text-gray-200 leading-relaxed text-lg">
+                    {point}
+                  </p>
+                </div>
               </div>
             </div>
           ))
         ) : (
-          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-            <p className="text-gray-700 leading-relaxed">
+          <div className="p-6 bg-gradient-to-r from-blue-500/10 to-cyan-400/10 border border-blue-400/20 rounded-xl">
+            <p className="text-gray-200 leading-relaxed text-lg">
               {summary}
             </p>
           </div>
         )}
       </div>
 
-      <div className="mt-6 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
-        <div className="flex items-start space-x-2">
-          <AlertTriangle className="h-5 w-5 text-yellow-600 flex-shrink-0 mt-0.5" />
+      <div className="mt-8 p-6 bg-gradient-to-r from-yellow-500/10 to-orange-400/10 border border-yellow-400/20 rounded-xl">
+        <div className="flex items-start space-x-4">
+          <div className="h-8 w-8 bg-gradient-to-r from-yellow-500 to-orange-400 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5">
+            <Sparkles className="h-4 w-4 text-white" />
+          </div>
           <div>
-            <p className="text-sm font-medium text-yellow-800">Just a heads up</p>
-            <p className="text-sm text-yellow-700 mt-1">
-              This is an AI-generated summary to help you understand the document better. 
-              For important legal decisions, it's always smart to run things by a real lawyer.
+            <p className="text-lg font-semibold text-yellow-300 mb-2">AI-Generated Insights</p>
+            <p className="text-yellow-200/90 leading-relaxed">
+              This summary was created by our advanced AI to help you quickly understand your document's key points. 
+              While highly accurate, we recommend consulting with a legal professional for critical decisions.
             </p>
           </div>
         </div>
